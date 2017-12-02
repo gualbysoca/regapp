@@ -1,0 +1,78 @@
+<!-- views/login.ejs -->
+<!doctype html>
+<html>
+<head>
+	<title>Registrar Ingreso</title>
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
+	<meta name="viewport" content="width=device-width, initial-scale=1 user-scalable=no">
+	<style>
+		body 		{ padding-top:40px; }
+	</style>
+</head>
+<body>
+<div class="container">
+
+<div class="col-sm-6 col-sm-offset-3">
+
+	<h1><span class="fa fa-sign-in"></span> Registrar Ingreso</h1>
+
+	<!-- show any messages that come back with authentication -->
+	<% if (message.length > 0) { %>
+		<div class="alert <%= msgtype%>"><%= message %></div>
+	<% } %>
+
+	<% if (client != null) { %>
+		<div class="jumbotron">
+			<!-- CLIENT INFORMATION -->
+		
+				<h3><span class="fa fa-user"></span> <%= client.nombres+" "+client.apellidos %></h3>
+
+					<p>
+						<strong>Edad:</strong>: <%= edad %><br>
+						<strong>Acceso</strong>: Concedido
+					</p>
+
+		</div>
+	<% } %>
+
+	<div class="container">
+
+	
+	
+</div>
+
+	<!-- REGISTER FORM -->
+	<form action="/login" method="post">
+		<div class="form-group">
+			<label>Documento de Identidad</label>
+			<input type="number" class="form-control" required name="ci" autofocus>
+		</div>
+		
+		<button type="submit" class="btn btn-warning btn-lg">Ingresar</button>
+	</form>
+
+	<br>
+
+	<p>Registrar cliente? <a href="/signup">Registrar</a></p>
+	<p>ir al <a href="/">Home</a>.</p>
+
+	<hr>
+		  <div class="row">
+		    <div class="col-sm-12">
+		      <div class="col-sm-6">
+		        <a href="#">Instrucciones de Uso</a> | <a href="#">Problemas?</a>    
+		      </div>
+		      <div class="col-sm-6">
+		        <p class="muted pull-right">© 2018 El Cortijo PUB. Todos los derechos reservados</p>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
+</div>
+
+
+</div>
+</body>
+</html>

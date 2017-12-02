@@ -1,0 +1,63 @@
+<!-- views/index.ejs -->
+<!doctype html>
+<html>
+<head>
+	<title>El Cortijo - Access Control Web App</title>
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
+	<meta name="viewport" content="width=device-width, initial-scale=1 user-scalable=no">
+	<style>
+		body 		{ padding-top:40px; }
+	</style>
+</head>
+<body>
+
+
+<div class="container">
+	<!-- show any messages that come back with authentication--> 
+	<% if (userEmail.length > 0) { %>
+		<!--<div class="alert-info">Usuario: <%= userEmail %></div><br>-->
+		<!-- LOCAL INFORMATION -->
+		<div class="row">
+			
+			<div class="col-sm-2">
+				<img class="img-responsive img-rounded center-block" align="centre" width="100px" src="https://scontent.flim1-2.fna.fbcdn.net/v/t1.0-9/17342477_1861623650761392_152599557480550739_n.png?oh=4cc9b1c6d3780ec5948c87defb1daf28&amp;oe=5A6A827E"><br>
+			</div>
+			
+			<div class="col-sm-4">
+					<div class="well">
+						<h3><span class="fa fa-user"></span> Usuario</h3>
+							<p> <%= userEmail %> </p>
+						<a href="/logout" class="btn btn-default btn-sm">Logout</a>
+					</div>
+			</div>
+
+		</div>
+	<% } %>
+
+	
+
+	
+
+	<div class="jumbotron text-center">
+		<a href="/login" class="btn btn-default"><span class="fa fa-sign-in"></span> Registrar Ingreso</a>
+		<a href="/signup" class="btn btn-default"><span class="fa fa-plus"></span> Registrar Cliente</a>
+		<a href="/black" class="btn btn-default"><span class="fa fa-sign-out"></span> Lista Negra</a>
+	</div>
+
+<hr>
+		  <div class="row">
+		    <div class="col-sm-12">
+		      <div class="col-sm-6">
+		        <a href="#">Instrucciones de Uso</a> | <a href="#">Problemas?</a>    
+		      </div>
+		      <div class="col-sm-6">
+		        <p class="muted pull-right">© 2018 El Cortijo PUB. Todos los derechos reservados</p>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
+</div>
+</body>
+</html>
