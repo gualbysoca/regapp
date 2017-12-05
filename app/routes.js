@@ -21,7 +21,8 @@ module.exports = function(app, registerService, passport) {
 	// LOGIN ===============================
 	// =====================================
 	// show the login form
-	app.get('/login', isLoggedIn, function(req, res) {
+	//app.get('/login', isLoggedIn, function(req, res) {
+	app.get('/login', function(req, res) {
 
 		// render the page and pass in any flash data if it exists
 		res.render('login.ejs', { message: req.flash('loginMessage'), msgtype:null, client:null, edad:null });
@@ -32,7 +33,8 @@ module.exports = function(app, registerService, passport) {
 	// 1. Verificar que no sea un cliente en la lista negra
 	// 2. Verificar que sea un cliente registrado [OK]
 	// 3. verificar que no se encuentre ya con un acceso registrado para el mismo dia [OK]
-	app.post('/login', isLoggedIn, function(req, res) {
+	//app.post('/login', isLoggedIn, function(req, res) {
+	app.post('/login', function(req, res) {
 		
 		var clientCi = req.body.ci;
 
@@ -53,13 +55,14 @@ module.exports = function(app, registerService, passport) {
 					client: null
 				});
 			});
-	
+
 	});
 	// =====================================
 	// SIGNUP ==============================
 	// =====================================
 	// show the signup form
-	app.get('/signup', isLoggedIn, function(req, res) {
+	//app.get('/signup', isLoggedIn, function(req, res) {
+	app.get('/signup', function(req, res) {
 		// render the page and pass in any flash data if it exists
 		res.render('signup.ejs', { message: req.flash('signupMessage'), msgtype:  req.flash('msgType'), maxdate: maxDate});
 	});

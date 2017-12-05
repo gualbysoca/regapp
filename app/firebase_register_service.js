@@ -14,10 +14,31 @@ var configDB = require('../config/database.js');
 	});
 
 	var ref = firebase.app().database().ref();
+
+	var todayDate = function(){
+		var today = new Date();  
+		var localoffset = -(today.getTimezoneOffset()/60);
+		var destoffset = -4;
+
+		var offset = destoffset-localoffset;
+		var d = new Date().getTime() + offset * 3600 * 1000
+
+		return d;
+	}
 	
 
 	var ClientDelayedSet = function (client) {
 		var clientRef = ref.child('clients/'+client.ci);
+		return new Promise(function (resolve, reject) {
+		    setTimeout(function () {
+		      	clientRef.set(client)
+		        	.then(resolve, reject);
+		    }, 1);
+		});
+	};
+
+	var CheckinDelayedSet = function (client) {
+		var clientRef = ref.child('checkins/'+client.ci);
 		return new Promise(function (resolve, reject) {
 		    setTimeout(function () {
 		      	clientRef.set(client)
@@ -36,10 +57,10 @@ var configDB = require('../config/database.js');
 		});
 	};
 
-	var loginDelayedSet = function (login) {
-		var todayDate = new Date();
-		todayDate = todayDate.toISOString().substr(0,10);
-		var accessRef = ref.child('logins/'+login.ci+"-"+todayDate);
+	var loginDelayedSet = function (login, date) {
+		//var todayDate = new Date();
+		//todayDate = todayDate.toISOString().substr(0,10);
+		var accessRef = ref.child('logins/'+login.ci+"-"+date);
 		return new Promise(function (resolve, reject) {
 		    setTimeout(function () {
 		      	accessRef.set(login)
@@ -70,7 +91,7 @@ var configDB = require('../config/database.js');
 		  		'tref': tref,
 		  		'bday': bday,
 		  		'sexo': sexo,
-		  		'fecha_alta': (new Date()).getTime(),
+		  		'fecha_alta': todayDate(),
 		  		'fecha_baja': null,
 		  		'activo': true
 		})
@@ -116,19 +137,23 @@ var configDB = require('../config/database.js');
 
 	exports.registerClientAccess = function(ci, isOk, callback) {
 		verifyClientBlacklist(ci, function(){
-			validateClientRegister(ci, function(client){
-				loginDelayedSet({
-			  		ci: ci,
-			  		ingreso: (new Date()).getTime(),
-			  		salida: null,
-			  		acceso: "concedido",
-				}).then(function() {
-				  	//console.log('Exito');
-			  		isOk(client);
-				})
-				.catch(function(err) {
-			  		//console.log('error', err);
-			  		callback(err.code);
+			validateClientRegister(ci, function(clientReg){
+				registerClientCheckin(ci, function(checkinDate){
+					loginDelayedSet({
+				  		ci: ci,
+				  		ingreso: checkinDate,
+				  		salida: null,
+				  		acceso: "Acceso concedido",
+					}, checkinDate).then(function() {
+					  	//console.log('Exito'+ new Date(todayDate()));
+				  		isOk(clientReg);
+					})
+					.catch(function(err) {
+				  		console.log('este es el error:', err);
+				  		callback(err.code);
+					});
+				},function(err){
+					callback(err);
 				});
 			},function(err){
 				callback(err);
@@ -138,12 +163,34 @@ var configDB = require('../config/database.js');
 		});
 	}
 
+	var registerClientCheckin = function(ci, isOki, callback) {
+		validateClientCheckin(ci, 
+		function(){
+			var checkinDate = todayDate();
+			CheckinDelayedSet({
+			  	ci: ci,
+			  	fechain: checkinDate,
+			  	fechaout: null,
+			  	checkedin: true
+			}).then(function() {
+				//console.log('Exito el registro en la BL');
+			  	isOki(checkinDate);
+			})
+			.catch(function(err) {
+			  	//console.log('error', err);
+			  	callback(err.code);
+			});
+		},function(err){
+			callback(err);
+		});
+	}
+
 	exports.clientToBlacklist = function(ci, motivo, isOki, callback) {
 		validateClientRegister(ci, 
 		function(client){
 			blacklistDelayedSet({
 			  	ci: ci,
-			  	fecha: (new Date()).getTime(),
+			  	fecha: todayDate(),
 			  	motivo: motivo
 			}).then(function() {
 				//console.log('Exito el registro en la BL');
@@ -166,9 +213,45 @@ var configDB = require('../config/database.js');
 		clientRef.once("value", function(snapshot) {
 		  	
 		  	if(snapshot.val() == null){
-		  		callback("Cliente no registrado.");
+		  		loginDelayedSet({
+				  	ci: ci,
+				  	ingreso: null,
+				  	salida: null,
+				  	acceso: "Acceso denegado:Cliente no registrado"
+				}, todayDate()).then(function() {
+					//console.log('Exito');
+				  	callback("Cliente no registrado.");
+				});
 		  	}else{
 		  		isOk(snapshot.val());
+		  	}
+
+		}, function (err) {
+		  	//console.log("The read failed: " + err.code);
+		  	callback(err.code);
+		});
+		
+	}
+
+	var validateClientCheckin = function(ci, isOk, callback) {
+		//optimizar el codigo con promesas en lugar de callbacks
+		// revisar si no hay una funcion que verifique si existe una ruta en la base de datos
+
+		var clientRef = ref.child('checkins/'+ci+'/checkedin');
+		clientRef.once("value", function(snapshot) {
+		  	
+		  	if(snapshot.val() == null || snapshot.val() == false){
+		  		isOk();
+		  	}else{
+		  		loginDelayedSet({
+				  	ci: ci,
+				  	ingreso: null,
+				  	salida: null,
+				  	acceso: "Acceso denegado:Cliente ya realizó un checkin"
+				}, todayDate()).then(function() {
+					  //console.log('Exito');
+				  	callback("El CI "+ci+" ya realizó un check-in.");
+				});
 		  	}
 
 		}, function (err) {
@@ -188,7 +271,15 @@ var configDB = require('../config/database.js');
 		  	if(snapshot.val() == null){
 		  		isOk();
 		  	}else{
-		  		callback("Cliente registrado en la lista negra. Acceso denegado.");
+		  		loginDelayedSet({
+				  	ci: ci,
+				  	ingreso: null,
+				  	salida: null,
+				  	acceso: "Acceso denegado:Cliente registrado en la lista negra"
+				}, todayDate()).then(function() {
+					  //console.log('Exito');
+				  	callback("Cliente registrado en la lista negra. Acceso denegado.");
+				});
 		  	}
 
 		}, function (err) {
@@ -281,6 +372,8 @@ var configDB = require('../config/database.js');
 		  	callback(errorMessage);
 		});
 	}
+
+
 	/*
 	exports.isLoggedIn = function(){
 			if (user!=null) {
