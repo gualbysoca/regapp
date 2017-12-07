@@ -9,13 +9,47 @@
 	<style>
 		body 		{ padding-top:40px; }
 	</style>
+	<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {    
+		    function clientCounter(){
+		        //alert("hola!");
+
+		        //value = $('#value').text("ya valio chorizo");
+		        //var dataString = 'value='+value;
+
+		        $.ajax({
+		            type: "GET",
+		            url: "ajax",
+		            //url: "www.google.com",
+		            //data: dataString,
+		            success: function(data) {
+		                $('#value').text(data);
+		            },error: function(err){
+		            	$('#value').text(err.code);
+		            }
+		        });
+		    }
+
+		    setInterval(clientCounter, 4000);
+		});
+	</script>
 </head>
 <body>
 <div class="container">
 
 <div class="col-sm-6 col-sm-offset-3">
 
-	<h1><span class="fa fa-sign-in"></span> Registrar Ingreso</h1>
+	
+
+	<div class="row">
+		<div class="col-sm-9">
+			<h1><span class="fa fa-sign-in"></span> Registrar Ingreso</h1>
+		</div>
+		<div class="col-sm-3">
+			<h1># <span id="value"></span></h1>
+		</div>
+	</div>
 
 	<!-- show any messages that come back with authentication -->
 	<% if (message.length > 0) { %>

@@ -73,6 +73,8 @@ module.exports = function(app, registerService, passport) {
 		var newClientNombres = req.body.nombres;
 		var newClientApellidos = req.body.apellidos;
 		var newClientCi = req.body.ci;
+		var newClientExp = req.body.exp;
+		var newClientCiudad = req.body.ciudad;
 		var newClientEmail = req.body.email;
 		var newClientTmovil = req.body.tmovil;
 		var newClientTref = req.body.tref;
@@ -81,7 +83,9 @@ module.exports = function(app, registerService, passport) {
 
 		registerService.addClient(newClientNombres, 
 								  newClientApellidos, 
-								  newClientCi, 
+								  newClientCi,
+								  newClientExp, 
+								  newClientCiudad,
 								  newClientEmail, 
 								  newClientTmovil, 
 								  newClientTref, 
@@ -273,6 +277,13 @@ module.exports = function(app, registerService, passport) {
 	         	res.redirect('/loginstaff');
 	     	}
 	  	});
+	});
+
+	//test section
+	app.get('/ajax', function(req, res){
+
+
+		res.send(registerService.clientCounter());
 	});
 
 	// =====================================

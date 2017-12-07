@@ -33,8 +33,40 @@
 			<input type="text" class="form-control" required name="apellidos">
 		</div>
 		<div class="form-group">
-			<label>Documento de Identidad</label>
-			<input type="number" class="form-control" required name="ci">
+			<div class="row">
+				<div class="col-sm-9">
+					<label>Documento de Identidad</label>
+					<input type="number" class="form-control" required name="ci">
+				</div>
+				<div class="col-sm-3">
+					<label>Exp. en</label>
+					<select name="exp" class="form-control">
+					  <option value="CB" selected>CB</option>
+					  <option value="LP">LP</option>
+					  <option value="SC">SC</option>
+					  <option value="OR">OR</option>
+					  <option value="PO">PO</option>
+					  <option value="CH">CH</option>
+					  <option value="BE">BE</option>
+					  <option value="PA">PA</option>
+					  <option value="TJ">TJ</option>
+					</select>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label>Ciudad de residencia</label>
+			<select name="ciudad" class="form-control">
+					  <option value="Cochabamba" selected>Cochabamba</option>
+					  <option value="La Paz">La Paz</option>
+					  <option value="Santa Cruz">Santa Cruz</option>
+					  <option value="Oruro">Oruro</option>
+					  <option value="Potosi">Potosi</option>
+					  <option value="Chuquisaca">Chuquisaca</option>
+					  <option value="Beni">Beni</option>
+					  <option value="Pando">Pando</option>
+					  <option value="Tarija">Tarija</option>
+					</select>
 		</div>
 		<div class="form-group">
 			<label>Email</label>
@@ -48,7 +80,7 @@
 				</div>
 				<div class="col-sm-6">
 					<label>Teléfono de referencia</label>
-					<input type="nember" class="form-control" name="tref">
+					<input type="number" class="form-control" name="tref">
 				</div>
 			</div>
 		</div>

@@ -80,12 +80,14 @@ var configDB = require('../config/database.js');
 	};
 
 
-	exports.addClient = function(nombres, apellidos, ci, email, tmovil, tref, bday, sexo, callback) {
+	exports.addClient = function(nombres, apellidos, ci, exp, ciudad, email, tmovil, tref, bday, sexo, callback) {
 		
 		ClientDelayedSet({
 		  		'nombres': nombres,
 		  		'apellidos': apellidos,
 		  		'ci': ci,
+		  		'exp': exp,
+		  		'ciudad': ciudad,
 		  		'email': email,
 		  		'tmovil': tmovil,
 		  		'tref': tref,
@@ -300,6 +302,24 @@ var configDB = require('../config/database.js');
 	    }
 
 	    return edad;
+	}
+
+	exports.clientCounter = function () {
+		var checkinRef = ref.child('checkins');
+		var count = 0;
+		checkinRef
+		.orderByChild("checkedin")
+		.equalTo(true)
+		.on("value", function(snapshot) {
+		 	count = snapshot.numChildren();
+		  	//snapshot.forEach(function(childSnapshot) {
+	            //console.log(childSnapshot.val());
+		    //});
+		  });
+
+		
+
+	    return count.toString();
 	}
 
 	exports.addStaff = function (email, password, nombres, apellidos, ci, tmovil, tref, bday, sexo, area, callback) {
