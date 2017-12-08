@@ -8,6 +8,7 @@
     "ejs": "~0.8.5",
     "express": "~3.4.4",
     "express-session": "~1.0.0",
+    "extend": "^3.0.1",
     "firebase": "^4.6.0",
     "method-override": "~1.0.0",
     "morgan": "~1.0.0",

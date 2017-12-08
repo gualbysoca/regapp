@@ -25,6 +25,41 @@ var configDB = require('../config/database.js');
 
 		return d;
 	}
+
+	var clientGenderGet = function(){
+		const checkinsRef = ref.child('checkins');
+		const clientsRef = ref.child('clients');
+		var countH = 0;
+		var countM = 0;
+
+		return new Promise(function (resolve, reject) {
+		    setTimeout(function () {
+		      	checkinsRef.orderByChild("checkedin").equalTo(true).once("value").then(function(checkinSnapshot) {
+					myCounter = checkinSnapshot.numChildren();
+						console.log(myCounter);
+					checkinSnapshot.forEach(function(aCheckinSnapshot) {
+
+						let clientRef = clientsRef.child(aCheckinSnapshot.key);
+						clientRef.once("value", function(clientSnapshot) {
+							
+					 		//console.log(clientSnapshot.val());
+
+					 		if(clientSnapshot.child("sexo").val() == "hombre"){
+					 			//console.log(clientSnapshot.child("sexo").val());
+					 			++countH;
+					 			--myCounter;
+					 			console.log(countH);
+					 		} else {
+					 			++countM;
+					 			console.log(countM);
+					 		}
+						});
+					});
+				})
+		        	.then(resolve, reject);
+		    }, 1);
+		});
+	}
 	
 
 	var ClientDelayedSet = function (client) {
@@ -165,6 +200,23 @@ var configDB = require('../config/database.js');
 		});
 	}
 
+	exports.retriveAllClientData = function(ci, isOk, callback) {
+		retriveClientRegister(ci, function(clientReg){
+			retriveClientBlacklist(ci, function(clientBL){
+				clientCheckinInfo(ci, function(clientCheckin){
+					//console.log("Aqui "+clientReg.nombres);
+					isOk({cr:clientReg, cbl:clientBL, cci:clientCheckin});
+				},function(err){
+					callback(err);
+				});
+			},function(err){
+				callback(err);
+			});
+		}, function(err){
+			callback(err);
+		});
+	}
+
 	var registerClientCheckin = function(ci, isOki, callback) {
 		validateClientCheckin(ci, 
 		function(){
@@ -205,6 +257,27 @@ var configDB = require('../config/database.js');
 		},function(err){
 			callback(err);
 		});
+	}
+
+	var retriveClientRegister = function(ci, isOk, callback) {
+		//optimizar el codigo con promesas en lugar de callbacks
+		// revisar si no hay una funcion que verifique si existe una ruta en la base de datos
+
+		var clientRef = ref.child('clients/'+ci);
+		//console.log(clientRef.toString());
+		clientRef.once("value", function(snapshot) {
+		  	
+		  	if(snapshot.val() == null){
+				callback("Cliente no registrado.");
+		  	}else{
+		  		isOk(snapshot.val());
+		  	}
+
+		}, function (err) {
+		  	//console.log("The read failed: " + err.code);
+		  	callback(err.code);
+		});
+		
 	}
 
 	var validateClientRegister = function(ci, isOk, callback) {
@@ -291,6 +364,20 @@ var configDB = require('../config/database.js');
 		
 	}
 
+	var retriveClientBlacklist = function(ci, isOk, callback) {
+		//optimizar el codigo con promesas en lugar de callbacks
+		// revisar si no hay una funcion que verifique si existe una ruta en la base de datos
+
+		var clientRef = ref.child('blacklist/'+ci);
+		clientRef.once("value", function(snapshot) {
+		  		isOk(snapshot.val());
+		}, function (err) {
+		  	//console.log("The read failed: " + err.code);
+		  	callback(err.code);
+		});
+		
+	}
+
 	exports.calcularEdad = function (fecha) {
 	    var hoy = new Date();
 	    var cumpleanos = new Date(fecha);
@@ -304,6 +391,19 @@ var configDB = require('../config/database.js');
 	    return edad;
 	}
 
+	var clientCheckinInfo = function (ci, isOK, callback) {
+		var checkinRef = ref.child('checkins/'+ci);
+		var count = 0;
+		checkinRef
+		.on("value", function(snapshot) {
+	    	//console.log(snapshot.val());
+	    	isOK(snapshot.val());
+		}, function (err) {
+		  	//console.log("The read failed: " + err.code);
+		  	callback(err.code);
+		});
+	}
+
 	exports.clientCounter = function () {
 		var checkinRef = ref.child('checkins');
 		var count = 0;
@@ -312,14 +412,110 @@ var configDB = require('../config/database.js');
 		.equalTo(true)
 		.on("value", function(snapshot) {
 		 	count = snapshot.numChildren();
-		  	//snapshot.forEach(function(childSnapshot) {
+		 	//console.log(count);
+		 	//snapshot.forEach(function(childSnapshot) {
 	            //console.log(childSnapshot.val());
 		    //});
-		  });
-
-		
-
+		});
+		//checkinRef.off("value");
 	    return count.toString();
+	}
+
+	/*var function2 = function(ref, callback){
+		var countH = 0;
+		ref.once("value", function(clientSnapshot) {
+				
+		 		console.log(clientSnapshot.val());
+
+		 		if(clientSnapshot.child("sexo").val() == "hombre"){
+		 			//console.log(clientSnapshot.child("sexo").val());
+		 			++countH;
+		 			//myCounter - 1;
+		 			console.log(countH);
+		 		} else {
+		 			++countM;
+		 			console.log(countM);
+		 		}
+		});
+		callback(countH);
+	} */
+
+	exports.clientGenderCounter = function (callback) {
+		const checkinsRef = ref.child('checkins');
+		const clientsRef = ref.child('clients');
+		var countH = 0;
+		var countM = 0;
+		var totalClientsCheckedinCounter = 0;
+
+		//const list = [{h:8, m:5}];
+
+		/*checkinsRef.orderByChild("checkedin").equalTo(true).on("child_added", function(checkinSnapshot) {
+			totalClientsCheckedinCounter = checkinSnapshot.numChildren();
+			let clientRef = clientsRef.child(checkinSnapshot.key);
+
+			clientRef.once("value", function(clientSnapshot) {
+				
+		 		//console.log(clientSnapshot.val());
+
+		 		if(clientSnapshot.child("sexo").val() == "hombre"){
+		 			//console.log(clientSnapshot.child("sexo").val());
+		 			++countH;
+		 			//myCounter - 1;
+		 			console.log(countH);
+		 		} else {
+		 			++countM;
+		 			console.log(countM);
+		 		}
+
+
+			});
+			setTimeout(function() {
+		      console.log("m: "+countH+countM);
+		      callback({h:countH, m:countM});
+		    }, 500);
+			
+		});*/
+
+		/*
+
+		checkinsRef.orderByChild("checkedin").equalTo(true).once("value", function(checkinSnapshot) {
+			//totalClientsCheckedinCounter = checkinSnapshot.numChildren();
+			function2(list, checkinSnapshot, clientsRef).then(function(list1){
+				console.log("mirame... "+list1.m);
+			});
+		});
+
+		*/
+		
+		checkinsRef.orderByChild("checkedin").equalTo(true).once("value", function(checkinSnapshot) {
+			//totalClientsCheckedinCounter = checkinSnapshot.numChildren();
+			checkinSnapshot.forEach(function(aCheckinSnapshot) {
+
+				let clientRef = clientsRef.child(aCheckinSnapshot.key);
+				clientRef.once("value", function(clientSnapshot) {
+					
+			 		//console.log(clientSnapshot.val());
+
+			 		if(clientSnapshot.child("sexo").val() == "hombre"){
+			 			//console.log(clientSnapshot.child("sexo").val());
+			 			++countH;
+			 			//console.log(countH);
+			 		} else {
+			 			++countM;
+			 			//console.log(countM);
+			 		}
+				});
+				
+			});
+			setTimeout(function() {
+		      //console.log("m: "+countH+countM);
+		      callback({h:countH, m:countM});
+		      //return ({h:8, m:8});
+		      //return ({h:countH.toString(), m:countM.toString()});
+		    }, 2000);
+			
+		}); 	
+		
 	}
 
 	exports.addStaff = function (email, password, nombres, apellidos, ci, tmovil, tref, bday, sexo, area, callback) {

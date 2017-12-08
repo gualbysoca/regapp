@@ -22,7 +22,7 @@ module.exports = function(app, registerService, passport) {
 	// =====================================
 	// show the login form
 	//app.get('/login', isLoggedIn, function(req, res) {
-	app.get('/login', function(req, res) {
+	app.get('/login', isLoggedIn, function(req, res) {
 
 		// render the page and pass in any flash data if it exists
 		res.render('login.ejs', { message: req.flash('loginMessage'), msgtype:null, client:null, edad:null });
@@ -34,7 +34,7 @@ module.exports = function(app, registerService, passport) {
 	// 2. Verificar que sea un cliente registrado [OK]
 	// 3. verificar que no se encuentre ya con un acceso registrado para el mismo dia [OK]
 	//app.post('/login', isLoggedIn, function(req, res) {
-	app.post('/login', function(req, res) {
+	app.post('/login', isLoggedIn, function(req, res) {
 		
 		var clientCi = req.body.ci;
 
@@ -62,13 +62,13 @@ module.exports = function(app, registerService, passport) {
 	// =====================================
 	// show the signup form
 	//app.get('/signup', isLoggedIn, function(req, res) {
-	app.get('/signup', function(req, res) {
+	app.get('/signup', isLoggedIn, function(req, res) {
 		// render the page and pass in any flash data if it exists
 		res.render('signup.ejs', { message: req.flash('signupMessage'), msgtype:  req.flash('msgType'), maxdate: maxDate});
 	});
 
 	// process the signup form
-	app.post('/signup', function(req, res) {
+	app.post('/signup', isLoggedIn, function(req, res) {
 		
 		var newClientNombres = req.body.nombres;
 		var newClientApellidos = req.body.apellidos;
@@ -279,12 +279,59 @@ module.exports = function(app, registerService, passport) {
 	  	});
 	});
 
-	//test section
+	// CLIENTS COUNTER
 	app.get('/ajax', function(req, res){
-
-
 		res.send(registerService.clientCounter());
 	});
+
+	// CHARTS
+	app.get('/charts', function(req, res){
+		registerService.clientGenderCounter(function(obj){
+			//console.log(obj.m);
+			res.send(obj);
+		});
+	});
+
+	// DASHBOARD 
+	app.get('/dashboard', function(req, res) {
+		//var genderList = {h: 0, m: 0};
+		res.render('dashboard.ejs', { message: req.flash('loginMessage'), msgtype:null, client:null, edad:null });
+		/*registerService.clientGenderCounter(function(obj){
+			//console.log(obj);
+			// render the page and pass in any flash data if it exists
+			res.render('dashboard.ejs', { message: req.flash('loginMessage'), msgtype:null, client:null, edad:null, genderList:obj });*/ 
+	});
+
+	// =====================================
+	// FINDER ===========================
+	// =====================================
+	app.get('/finder', function(req, res) {
+		//var genderList = {h: 0, m: 0};
+		res.render('finder.ejs', { message: req.flash('loginMessage'), msgtype:null, client:null, edad:null });
+		/*registerService.clientGenderCounter(function(obj){
+			//console.log(obj);
+			// render the page and pass in any flash data if it exists
+			res.render('dashboard.ejs', { message: req.flash('loginMessage'), msgtype:null, client:null, edad:null, genderList:obj });*/ 
+	});
+
+	app.post('/finder', function(req, res) {
+		
+		var clientCi = req.body.ci;
+
+		registerService.retriveAllClientData(clientCi,
+			function(obj) {	
+				//console.log("Aqui2 "+obj.cr.nombres);
+				res.render('finder.ejs', { message: req.flash('loginMessage'), msgtype:null, client:obj, edad:null });									
+			}, function(err){
+				res.render('finder.ejs', {
+					message: "Ocurrio un error al buscar la información del cliente: " + err, 
+					msgtype: "alert-danger",
+					client:null,
+					edad:null,
+				});
+			});
+	});	
+
 
 	// =====================================
 	// VERIFY LOGIN ========================

@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+<head>
+	<title>Client finder</title>
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
+	<meta name="viewport" content="width=device-width, initial-scale=1 user-scalable=no">
+	<style>
+		body 		{ padding-top:40px; }
+	</style>
+	
+</head>
+<body>
+<div class="container">
+
+<div class="col-sm-6 col-sm-offset-3">
+	<!-- show any messages that come back -->
+	<% if (message.length > 0) { %>
+		<div class="alert <%= msgtype%>"><%= message %></div>
+	<% } %>
+	<p>
+	<!-- SEARCH FORM -->
+	<form action="/finder" method="post">
+		<div class="form-group">
+			<label>Buscar por CI</label>
+			<input type="number" class="form-control" required name="ci" autofocus>
+		</div>
+		
+		<button type="submit" class="btn btn-warning btn-lg">Buscar</button>
+	</form> 
+	<p>
+	
+
+	<% if (client != null) { %>
+		<div class="jumbotron">
+			<!-- CLIENT INFORMATION -->
+		
+				<h3><span class="fa fa-user"></span> <%= client.cr.nombres+" "+client.cr.apellidos %></h3>
+
+					<p>
+						<% if (client.cr != null) { %>
+							<strong>CI: </strong><%= client.cr.ci%><br>
+							<strong>Fecha de nac: </strong><%= new Date(client.cr.bday).toLocaleString().split(" ")[0]%><br>
+							<strong>Fecha de registro: </strong><%= new Date(client.cr.fecha_alta).toLocaleString() %><br>
+							<strong>Sexo: </strong><%= client.cr.sexo %><br>
+							<strong>Telf móvil: </strong><%= client.cr.tmovil %> <br>
+							<strong>Telf referencia: </strong><%= client.cr.tref %> <br><br>
+						<% } %>
+						<% if (client.cbl != null) { %>
+							Registrado en la lista negra<br>
+							<strong>En fecha: </strong><%= new Date(client.cbl.fecha).toLocaleString() %><br>
+							<strong>Motivo: </strong><%= client.cbl.motivo %><br><br>
+						<% } %>
+						<% if (client.cci != null) { %>
+							<strong>Último ingreso: </strong><%= new Date(client.cci.fechain).toLocaleString() %> <br>
+						<% } %>
+						
+					</p>
+
+		</div>
+	<% } %>
+
+	<p>Estadisticas <a href="/dashboard">Ver</a></p>
+	<p>Registrar personal <a href="/regstaff">Registrar</a>.</p>
+
+	<hr>
+		  <div class="row">
+		    <div class="col-sm-12">
+		      <div class="col-sm-6">
+		        <a href="#">Instrucciones de Uso</a> | <a href="#">Problemas?</a>    
+		      </div>
+		      <div class="col-sm-6">
+		        <p class="muted pull-right">© 2018 El Cortijo PUB. Todos los derechos reservados</p>
+		      </div>
+		    </div>
+		  </div>
+
+
+
+</div>
+</body>
+</html>
