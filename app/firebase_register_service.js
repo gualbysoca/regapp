@@ -421,6 +421,23 @@ var configDB = require('../config/database.js');
 	    return count.toString();
 	}
 
+	exports.registredClientsCounter = function (callback) {
+		var clientsRef = ref.child('clients');
+		var count = 0;
+		clientsRef
+		.on("value", function(snapshot) {
+		 	count = snapshot.numChildren();
+		 	//return count;
+		 	//console.log(count);
+		 	//snapshot.forEach(function(childSnapshot) {
+	            //console.log(childSnapshot.val());
+		    //});
+		    //return count.toString();
+		    callback(count);
+		});
+		//return count.toString();
+	}
+
 	/*var function2 = function(ref, callback){
 		var countH = 0;
 		ref.once("value", function(clientSnapshot) {

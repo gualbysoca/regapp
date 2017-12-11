@@ -40,9 +40,14 @@
 	
 
 	<div class="jumbotron text-center">
-		<a href="/login" class="btn btn-default"><span class="fa fa-sign-in"></span> Registrar Ingreso</a>
-		<a href="/signup" class="btn btn-default"><span class="fa fa-plus"></span> Registrar Cliente</a>
-		<a href="/black" class="btn btn-default"><span class="fa fa-sign-out"></span> Lista Negra</a>
+		<% if (userEmail == "samuel@grupodonal.com" || userEmail == "telco.gmm@gmail.com") { %>
+			<a href="/regstaff" class="btn btn-default"><span class="glyphicon glyphicon-user"></span> Registrar personal de Staff</a>
+			<a href="/dashboard" class="btn btn-default"><span class="glyphicon glyphicon-stats"></span> Ver estadisticas</a>
+			<a href="/finder" class="btn btn-default"><span class="glyphicon glyphicon-search"></span> Buscar info de cliente</a>
+		<% } %>
+		<a href="/login" class="btn btn-default"><span class="glyphicon glyphicon-check"></span> Check-In de Clientes</a>
+		<a href="/signup" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Registrar Cliente</a>
+		<a href="/black" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> Lista Negra</a>
 	</div>
 
 <hr>

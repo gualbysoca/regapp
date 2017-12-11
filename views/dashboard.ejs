@@ -19,9 +19,12 @@
 		            //url: "www.google.com",
 		            //data: dataString,
 		            success: function(data) {
-		                $('#value').text(data);
+		            	//alert(data.registredClientsNumber);
+		                $('#value').text(data.checkedInClientsNumber);
+		                $('#registredClients').text(data.registredClientsNumber);
 		            },error: function(err){
 		            	$('#value').text(err.code);
+		            	$('#registredClients').text(err.code);
 		            }
 		        });
 		    }
@@ -114,16 +117,20 @@
 	<% } %>
 	<p>
 
-			<label>Total clientes</label>
+			<label># de clientes checked-in</label>
 			<div class="jumbotron" align="center">
 				<h1><span id="value"></span></h1>
 			</div>
 
-			<label>Porcentaje H/M</label>
+			<label>Clientes registrados</label>
+			<div class="jumbotron" align="center">
+				<h1><span id="registredClients"></span></h1>
+			</div>
+			
+			<label>Check-ins: Porcentaje H/M</label>
 			<div class="jumbotron" align="center">
 				<canvas id="myChart" width="100%"></canvas>
 			</div>
-	
 	
 
 

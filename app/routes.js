@@ -5,7 +5,7 @@
 module.exports = function(app, registerService, passport) {
 
 	var maxDate = new Date();
-	maxDate.setFullYear(maxDate.getFullYear() - 21);
+	maxDate.setFullYear(maxDate.getFullYear() - 18);
 	maxDate = maxDate.toISOString().substr(0,10);
 
 	
@@ -159,14 +159,14 @@ module.exports = function(app, registerService, passport) {
 	// CREATE STAFF ========================
 	//======================================
 	// show the register security staff form
-	app.get('/regstaff', function(req, res) {
+	app.get('/regstaff', isLoggedIn, function(req, res) {
 
 		// render the page and pass in any flash data if it exists
 		res.render('staff.ejs', { message: req.flash('loginMessage'), msgtype:null});
 	});
 
 	//Create new user
-	app.post('/regstaff', function(req, res) {
+	app.post('/regstaff', isLoggedIn, function(req, res) {
 
 		var newStaffEmail = req.body.email;
 		var newStaffPass = req.body.password;
@@ -281,7 +281,14 @@ module.exports = function(app, registerService, passport) {
 
 	// CLIENTS COUNTER
 	app.get('/ajax', function(req, res){
-		res.send(registerService.clientCounter());
+		registerService.registredClientsCounter(function(count){
+			//console.log(count);
+			res.send({checkedInClientsNumber:registerService.clientCounter(),
+				//registredClientsNumber:registerService.registredClientsCounter()
+				registredClientsNumber: count
+			});
+		});
+		
 	});
 
 	// CHARTS
@@ -293,7 +300,7 @@ module.exports = function(app, registerService, passport) {
 	});
 
 	// DASHBOARD 
-	app.get('/dashboard', function(req, res) {
+	app.get('/dashboard', isLoggedIn, function(req, res) {
 		//var genderList = {h: 0, m: 0};
 		res.render('dashboard.ejs', { message: req.flash('loginMessage'), msgtype:null, client:null, edad:null });
 		/*registerService.clientGenderCounter(function(obj){
@@ -305,7 +312,7 @@ module.exports = function(app, registerService, passport) {
 	// =====================================
 	// FINDER ===========================
 	// =====================================
-	app.get('/finder', function(req, res) {
+	app.get('/finder', isLoggedIn, function(req, res) {
 		//var genderList = {h: 0, m: 0};
 		res.render('finder.ejs', { message: req.flash('loginMessage'), msgtype:null, client:null, edad:null });
 		/*registerService.clientGenderCounter(function(obj){
@@ -314,7 +321,7 @@ module.exports = function(app, registerService, passport) {
 			res.render('dashboard.ejs', { message: req.flash('loginMessage'), msgtype:null, client:null, edad:null, genderList:obj });*/ 
 	});
 
-	app.post('/finder', function(req, res) {
+	app.post('/finder', isLoggedIn, function(req, res) {
 		
 		var clientCi = req.body.ci;
 
